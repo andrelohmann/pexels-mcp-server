@@ -1,8 +1,11 @@
 # Build output
-dist/
+build/
 
 # Dependencies
 node_modules/
+
+# tmp Donwload files
+tmp/
 
 # Logs
 npm-debug.log*

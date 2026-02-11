@@ -1,35 +1,25 @@
-FROM node:18-alpine AS builder
+FROM node:24-slim AS build
+WORKDIR /opt/mcp
 
-WORKDIR /usr/src/app
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy package files for better layer caching
-COPY package.json ./
-
-# Install npm instead of pnpm since that's more widely supported
-RUN npm install
-
-# Copy source files
-COPY . .
-
-# Build the application
+COPY tsconfig.json ./
+COPY src ./src
 RUN npm run build
 
-# Production stage
-FROM node:18-alpine AS release
+FROM node:24-slim AS runtime
+WORKDIR /opt/mcp
 
-WORKDIR /usr/src/app
+ENV NODE_ENV=production
 
-# Copy only package files first (for better layer caching)
-COPY package.json ./
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-# Only install production dependencies
-RUN npm install --omit=dev
+COPY --from=build /opt/mcp/build /opt/mcp/build
 
-# Copy the built application from builder stage
-COPY --from=builder /usr/src/app/dist ./dist
+WORKDIR /workspace
 
-# Set default API key as empty (will be overridden by smithery config)
-ENV PEXELS_API_KEY=""
+USER node
 
-# Run the application
-CMD ["node", "dist/main.js"]
+CMD ["node", "/opt/mcp/build/index.js"]

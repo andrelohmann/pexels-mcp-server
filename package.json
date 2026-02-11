@@ -3,24 +3,30 @@
   "version": "1.0.0",
   "description": "MCP server for handling model context protocol with Pexels API integration",
   "type": "module",
-  "main": "dist/main.js",
-  "bin": "dist/main.js",
+  "main": "build/index.js",
+  "bin": "build/index.js",
+  "files": [
+    "build"
+  ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/main.ts"
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "dev": "tsx watch src/index.ts",
+    "test:mcp": "node scripts/test-mcp.mjs",
+    "test:mcp:download": "node scripts/test-mcp-download.mjs",
+    "test:mcp:docker": "scripts/test-mcp-docker.sh",
+    "test:mcp:download:docker": "scripts/test-mcp-download-docker.sh"
   },
   "keywords": ["mcp", "ai", "model-context-protocol", "pexels", "api"],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.11.0",
-    "zod": "^3.22.4",
-    "node-fetch": "^2.7.0"
+    "@modelcontextprotocol/sdk": "1.26.0",
+    "zod": "^4.3.6",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "tsx": "^4.7.0",
-    "typescript": "^5.8.0",
-    "@types/node": "^22.0.0",
-    "@types/node-fetch": "^2.6.11"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^25.2.3"
   }
 }

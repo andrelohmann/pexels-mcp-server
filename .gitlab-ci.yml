@@ -1,0 +1,22 @@
+stages:
+  - build
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
+build_runtime_image:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - docker info
+    - |
+      if [ -n "${CI_REGISTRY:-}" ] && [ -n "${CI_REGISTRY_USER:-}" ] && [ -n "${CI_REGISTRY_PASSWORD:-}" ]; then
+        echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      fi
+    - docker build --target runtime -t "${CI_REGISTRY_IMAGE:-mcp-pexels}:${CI_COMMIT_SHA}" .
+    - |
+      if [ -n "${CI_REGISTRY:-}" ] && [ -n "${CI_REGISTRY_USER:-}" ] && [ -n "${CI_REGISTRY_PASSWORD:-}" ]; then
+        docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+      fi
